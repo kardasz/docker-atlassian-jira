@@ -27,8 +27,10 @@ ENV DOWNLOAD_URL        https://downloads.atlassian.com/software/jira/downloads/
 # https://confluence.atlassian.com/display/STASH/Stash+home+directory
 ENV JIRA_HOME          /var/atlassian/application-data/jira
 
-ENV JAVA_HOME /opt/jdk/$ORACLE_JDK_VERSION
-ENV JAVA_OPTS "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
+ENV JAVA_HOME /opt/jdk/${ORACLE_JDK_VERSION
+ENV JAVA_TRUSTSTORE ${JAVA_HOME}/jre/lib/security/cacerts
+ENV JAVA_TRUSTSTORE_PASSWORD changeit
+ENV JAVA_OPTS "-Djavax.net.ssl.trustStore=${JAVA_TRUSTSTORE} -Djavax.net.ssl.trustStorePassword=${JAVA_TRUSTSTORE_PASSWORD}"
 
 # Use the default unprivileged account. This could be considered bad practice
 # on systems where multiple processes end up being executed by 'daemon' but
