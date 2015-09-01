@@ -50,7 +50,7 @@ ENV JIRA_VERSION 6.4.11
 RUN mkdir -p                             ${JIRA_INSTALL_DIR} \
     && curl -L --silent                  ${DOWNLOAD_URL}${JIRA_VERSION}.tar.gz | tar -xz --strip=1 -C "$JIRA_INSTALL_DIR" \
     && mkdir -p                          ${JIRA_INSTALL_DIR}/conf/Catalina      \
-    && chown -R nobody:nobody            ${JIRA_INSTALL_DIR}/                   \
+    && chown -R nobody:nogroup           ${JIRA_INSTALL_DIR}/                   \
     && chmod -R 755                      ${JIRA_INSTALL_DIR}/                   \
     && chmod -R 700                      ${JIRA_INSTALL_DIR}/conf/Catalina      \
     && chmod -R 700                      ${JIRA_INSTALL_DIR}/logs               \
