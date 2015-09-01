@@ -75,7 +75,7 @@ RUN \
     tar xzf ${JIRA_INSTALL_DIR}/mysql-connector-java-5.1.36.tar.gz -C ${JIRA_INSTALL_DIR} && \
     mv ${JIRA_INSTALL_DIR}/mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar ${JIRA_INSTALL_DIR}/lib/ && \
     rm -rf ${JIRA_INSTALL_DIR}/mysql-connector-java-5.1.36.tar.gz ${JIRA_INSTALL_DIR}/mysql-connector-java-5.1.36 && \
-    rm -f ${JIRA_INSTALL_DIR}atlassian-jira/WEB-INF/lib/{activation,mail}-*.jar
+    rm -f ${JIRA_INSTALL_DIR}/atlassian-jira/WEB-INF/lib/{activation,mail}-*.jar
 
 
 USER ${RUN_USER}:${RUN_GROUP}
