@@ -9,6 +9,27 @@ RUN apt-get update -qq \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+# add gosu for easy step-down from root
+ENV GOSU_VERSION 1.7
+RUN set -x \
+	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
+	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+	&& export GNUPGHOME="$(mktemp -d)" \
+	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu \
+	&& gosu nobody true
+
+# Use the default unprivileged account. This could be considered bad practice
+# on systems where multiple processes end up being executed by 'daemon' but
+# here we only ever run one process anyway.
+ENV RUN_USER            atlassian
+ENV RUN_USER_UID        5000
+ENV RUN_GROUP           atlassian
+ENV RUN_GROUP_GID       5000
+
 # Oracle JDK
 ENV ORACLE_JDK_VERSION jdk-8u151
 ENV ORACLE_JDK_URL http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.tar.gz
@@ -26,40 +47,18 @@ ENV JAVA_TRUSTSTORE ${JAVA_HOME}/jre/lib/security/cacerts
 ENV JAVA_TRUSTSTORE_PASSWORD changeit
 ENV JAVA_OPTS "-Djavax.net.ssl.trustStore=${JAVA_TRUSTSTORE} -Djavax.net.ssl.trustStorePassword=${JAVA_TRUSTSTORE_PASSWORD}"
 
-# Use the default unprivileged account. This could be considered bad practice
-# on systems where multiple processes end up being executed by 'daemon' but
-# here we only ever run one process anyway.
-ENV RUN_USER            atlassian
-ENV RUN_USER_UID        5000
-ENV RUN_GROUP           atlassian
-ENV RUN_GROUP_GID       5000
-
-RUN \
-    groupadd --gid ${RUN_GROUP_GID} -r ${RUN_GROUP} && \
-    useradd -r --uid ${RUN_USER_UID} -g ${RUN_GROUP} ${RUN_USER}
-
 ENV JIRA_VERSION 7.6.0
 ENV JIRA_HOME /opt/atlassian/jira/data
+ENV JIRA_INSTALL_DIR /opt/atlassian/jira
 
-RUN \
-    mkdir -p ${JIRA_HOME} && \
-    chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_HOME}
-
-ENV JIRA_INSTALL_DIR   /opt/atlassian/jira
-
-RUN mkdir -p                             ${JIRA_INSTALL_DIR} \
+RUN mkdir -p ${JIRA_INSTALL_DIR} ${JIRA_HOME} \
     && curl -L --silent                  ${DOWNLOAD_URL}${JIRA_VERSION}.tar.gz | tar -xz --strip=1 -C "$JIRA_INSTALL_DIR" \
     && mkdir -p                          ${JIRA_INSTALL_DIR}/conf/Catalina      \
-    && chown -R root:root                ${JIRA_INSTALL_DIR}/                   \
     && chmod -R 755                      ${JIRA_INSTALL_DIR}/                   \
     && chmod -R 700                      ${JIRA_INSTALL_DIR}/conf/Catalina      \
     && chmod -R 700                      ${JIRA_INSTALL_DIR}/logs               \
     && chmod -R 700                      ${JIRA_INSTALL_DIR}/temp               \
-    && chmod -R 700                      ${JIRA_INSTALL_DIR}/work               \
-    && chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_INSTALL_DIR}/logs               \
-    && chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_INSTALL_DIR}/temp               \
-    && chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_INSTALL_DIR}/work               \
-    && chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_INSTALL_DIR}/conf
+    && chmod -R 700                      ${JIRA_INSTALL_DIR}/work
 
 # MySQL connector
 ENV MYSQL_CONNECTOR_VERSION 5.1.44
@@ -69,12 +68,18 @@ RUN \
     mv ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}-bin.jar ${JIRA_INSTALL_DIR}/lib/ && \
     rm -rf ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}
 
-USER ${RUN_USER}:${RUN_GROUP}
+ENV PATH $JIRA_INSTALL_DIR/bin:$JAVA_HOME/bin:$PATH
 
 VOLUME ["${JIRA_INSTALL_DIR}"]
 
 EXPOSE 8080
 
+COPY docker-entrypoint.sh /entrypoint.sh
+
+RUN chmod a+x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
 WORKDIR $JIRA_INSTALL_DIR
 
-CMD ["./bin/start-jira.sh", "-fg"]
+CMD ["start-jira.sh", "-fg"]
