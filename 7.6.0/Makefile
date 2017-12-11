@@ -1,19 +1,17 @@
 # which service (from docker-compose.yml:services) to run commands agains
 SERVICE ?=
 
-BIND_IP ?= 127.0.0.1
-TZ ?= UTC
-JIRA_BACKUP_VOLUME ?=
-POSTGRES_PASSWORD ?= jira
-PROJECT_NAME ?= atlassian_jira
-
 EXEC_ARGS ?=
-UP_ARGS ?= -d --force-recreate
+RUN_ARGS ?=
 DOWN_ARGS ?= --remove-orphans
 BUILD_ARGS ?=
 
-COMPOSE_ENV = BIND_IP=$(BIND_IP) TZ=$(TZ) JIRA_BACKUP_VOLUME=${JIRA_BACKUP_VOLUME} POSTGRES_PASSWORD=$(POSTGRES_PASSWORD)
+include .env
+export
+
 COMPOSE_FILE_ARGS ?= -f $(CURDIR)/docker-compose.yml
+
+DOCKER_COMPOSE = docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME)
 
 ifeq ($(shell uname -s),Darwin)
 XARGS_OPTS =
@@ -22,7 +20,7 @@ XARGS_OPTS = -r
 endif
 
 build:
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) build --no-cache
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) build --no-cache jira
 
 push: build
 	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) push jira
@@ -41,6 +39,9 @@ rm: stop
 
 restart: env-check
 	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) restart $(SERVICE)
+
+recreate: env-check
+	$(DOCKER_COMPOSE) up -d --force-recreate --build jira
 
 down: env-check
 	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) down $(DOWN_ARGS)

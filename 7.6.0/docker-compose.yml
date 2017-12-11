@@ -13,7 +13,7 @@ services:
         - postgres-data:/var/lib/postgresql/data
   jira:
     build: .
-    image: kardasz/atlassian-jira
+    image: webinventions/atlassian-jira
     ports:
       - "${BIND_IP}:8080:8080"
     depends_on:
@@ -24,21 +24,6 @@ services:
       TZ: ${TZ:-UTC}
     volumes:
       - jira-data:/var/atlassian/jira/data
-  backup:
-    build: ./services/backup
-    depends_on:
-      - postgres
-      - jira
-    links:
-      - postgres
-    environment:
-      TZ: ${TZ:-UTC}
-      PGPASSWORD: ${POSTGRES_PASSWORD:-jira}
-      JIRA_HOME: /var/atlassian/jira/data
-    volumes:
-      - jira-data:/var/atlassian/jira/data
-      - ${JIRA_BACKUP_VOLUME:-jira-backup}:/var/atlassian/jira/backup
 volumes:
   postgres-data:
   jira-data:
-  jira-backup:

@@ -1,21 +1,17 @@
-FROM debian:jessie
-
-MAINTAINER Krzysztof Kardasz <krzysztof@kardasz.eu>
+FROM debian:stretch
 
 # Update system and install required packages
 ENV DEBIAN_FRONTEND noninteractive
 
-# Install git, download and extract Stash and create the required directory layout.
-# Try to limit the number of RUN instructions to minimise the number of layers that will need to be created.
 RUN apt-get update -qq \
     && apt-get install -y wget curl git unzip libtcnative-1 xmlstarlet \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-# Download Oracle JDK
-ENV ORACLE_JDK_VERSION jdk-8u121
-ENV ORACLE_JDK_URL    http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.tar.gz
+# Oracle JDK
+ENV ORACLE_JDK_VERSION jdk-8u151
+ENV ORACLE_JDK_URL http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.tar.gz
 RUN mkdir -p /opt/jdk/$ORACLE_JDK_VERSION && \
     wget --header "Cookie: oraclelicense=accept-securebackup-cookie" -O /opt/jdk/$ORACLE_JDK_VERSION/$ORACLE_JDK_VERSION.tar.gz $ORACLE_JDK_URL && \
     tar -zxf /opt/jdk/$ORACLE_JDK_VERSION/$ORACLE_JDK_VERSION.tar.gz --strip-components=1 -C /opt/jdk/$ORACLE_JDK_VERSION && \
@@ -42,14 +38,14 @@ RUN \
     groupadd --gid ${RUN_GROUP_GID} -r ${RUN_GROUP} && \
     useradd -r --uid ${RUN_USER_UID} -g ${RUN_GROUP} ${RUN_USER}
 
+ENV JIRA_VERSION 7.6.0
+ENV JIRA_HOME /opt/atlassian/jira/data
 
-ENV JIRA_HOME          /var/atlassian/jira/data
 RUN \
     mkdir -p ${JIRA_HOME} && \
     chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_HOME}
 
 ENV JIRA_INSTALL_DIR   /opt/atlassian/jira
-ENV JIRA_VERSION 7.3.1
 
 RUN mkdir -p                             ${JIRA_INSTALL_DIR} \
     && curl -L --silent                  ${DOWNLOAD_URL}${JIRA_VERSION}.tar.gz | tar -xz --strip=1 -C "$JIRA_INSTALL_DIR" \
@@ -66,7 +62,7 @@ RUN mkdir -p                             ${JIRA_INSTALL_DIR} \
     && chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_INSTALL_DIR}/conf
 
 # MySQL connector
-ENV MYSQL_CONNECTOR_VERSION 5.1.40
+ENV MYSQL_CONNECTOR_VERSION 5.1.44
 RUN \
     wget -O ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz && \
     tar xzf ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz -C ${JIRA_INSTALL_DIR} && \
