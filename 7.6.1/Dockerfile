@@ -30,19 +30,14 @@ RUN mkdir -p /opt/jdk/$ORACLE_JDK_VERSION && \
 ENV DOWNLOAD_URL        https://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-
 
 ENV JAVA_HOME /opt/jdk/${ORACLE_JDK_VERSION}
-RUN export JAVA_HOME=${JAVA_HOME}
 
 ENV JAVA_TRUSTSTORE ${JAVA_HOME}/jre/lib/security/cacerts
 ENV JAVA_TRUSTSTORE_PASSWORD changeit
 ENV JAVA_OPTS "-Djavax.net.ssl.trustStore=${JAVA_TRUSTSTORE} -Djavax.net.ssl.trustStorePassword=${JAVA_TRUSTSTORE_PASSWORD}"
 
 ENV JIRA_VERSION 7.6.1
-
 ENV JIRA_HOME /opt/atlassian/jira/data
-RUN export JIRA_HOME=${JIRA_HOME}
-
 ENV JIRA_INSTALL_DIR /opt/atlassian/jira
-RUN export JIRA_INSTALL_DIR=${JIRA_INSTALL_DIR}
 
 RUN mkdir -p ${JIRA_INSTALL_DIR} ${JIRA_HOME} \
     && curl -L --silent                  ${DOWNLOAD_URL}${JIRA_VERSION}.tar.gz | tar -xz --strip=1 -C "$JIRA_INSTALL_DIR" \
@@ -62,8 +57,6 @@ RUN \
     rm -rf ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}
 
 ENV PATH $JIRA_INSTALL_DIR/bin:$JAVA_HOME/bin:$PATH
-
-VOLUME ["${JIRA_INSTALL_DIR}"]
 
 EXPOSE 8080
 
