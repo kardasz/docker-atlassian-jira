@@ -36,17 +36,12 @@ ENV JAVA_TRUSTSTORE_PASSWORD changeit
 ENV JAVA_OPTS "-Djavax.net.ssl.trustStore=${JAVA_TRUSTSTORE} -Djavax.net.ssl.trustStorePassword=${JAVA_TRUSTSTORE_PASSWORD}"
 
 ENV JIRA_VERSION 7.6.1
-ENV JIRA_HOME /opt/atlassian/jira/data
+ENV JIRA_HOME /var/atlassian/jira/data
 ENV JIRA_INSTALL_DIR /opt/atlassian/jira
 
-RUN mkdir -p ${JIRA_INSTALL_DIR} ${JIRA_HOME} \
-    && curl -L --silent                  ${DOWNLOAD_URL}${JIRA_VERSION}.tar.gz | tar -xz --strip=1 -C "$JIRA_INSTALL_DIR" \
-    && mkdir -p                          ${JIRA_INSTALL_DIR}/conf/Catalina      \
-    && chmod -R 755                      ${JIRA_INSTALL_DIR}/                   \
-    && chmod -R 700                      ${JIRA_INSTALL_DIR}/conf/Catalina      \
-    && chmod -R 700                      ${JIRA_INSTALL_DIR}/logs               \
-    && chmod -R 700                      ${JIRA_INSTALL_DIR}/temp               \
-    && chmod -R 700                      ${JIRA_INSTALL_DIR}/work
+RUN mkdir -p ${JIRA_INSTALL_DIR} ${JIRA_HOME} && \
+    curl -L --silent  ${DOWNLOAD_URL}${JIRA_VERSION}.tar.gz | tar -xz --strip=1 -C "$JIRA_INSTALL_DIR" && \
+    chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_HOME} ${JIRA_INSTALL_DIR}
 
 # MySQL connector
 ENV MYSQL_CONNECTOR_VERSION 5.1.44
