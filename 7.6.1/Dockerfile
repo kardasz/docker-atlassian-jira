@@ -9,14 +9,6 @@ RUN apt-get update -qq \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-# Use the default unprivileged account. This could be considered bad practice
-# on systems where multiple processes end up being executed by 'daemon' but
-# here we only ever run one process anyway.
-ENV RUN_USER            atlassian
-ENV RUN_USER_UID        5000
-ENV RUN_GROUP           atlassian
-ENV RUN_GROUP_GID       5000
-
 # Oracle JDK
 ENV ORACLE_JDK_VERSION jdk-8u151
 ENV ORACLE_JDK_URL http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.tar.gz
@@ -34,6 +26,15 @@ ENV JAVA_HOME /opt/jdk/${ORACLE_JDK_VERSION}
 ENV JAVA_TRUSTSTORE ${JAVA_HOME}/jre/lib/security/cacerts
 ENV JAVA_TRUSTSTORE_PASSWORD changeit
 ENV JAVA_OPTS "-Djavax.net.ssl.trustStore=${JAVA_TRUSTSTORE} -Djavax.net.ssl.trustStorePassword=${JAVA_TRUSTSTORE_PASSWORD}"
+
+ENV RUN_USER            atlassian
+ENV RUN_USER_UID        5000
+ENV RUN_GROUP           atlassian
+ENV RUN_GROUP_GID       5000
+
+RUN \
+    groupadd --gid ${RUN_GROUP_GID} -r ${RUN_GROUP} && \
+    useradd -r --uid ${RUN_USER_UID} -g ${RUN_GROUP} ${RUN_USER}
 
 ENV JIRA_VERSION 7.6.1
 ENV JIRA_HOME /var/atlassian/jira/data
