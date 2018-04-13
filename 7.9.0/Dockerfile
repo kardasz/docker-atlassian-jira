@@ -36,7 +36,7 @@ RUN \
     groupadd --gid ${RUN_GROUP_GID} -r ${RUN_GROUP} && \
     useradd -r --uid ${RUN_USER_UID} -g ${RUN_GROUP} ${RUN_USER}
 
-ENV JIRA_VERSION 7.8.1
+ENV JIRA_VERSION 7.9.0
 ENV JIRA_HOME /var/atlassian/jira/data
 ENV JIRA_INSTALL_DIR /opt/atlassian/jira
 
