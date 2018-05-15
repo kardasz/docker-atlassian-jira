@@ -10,8 +10,8 @@ RUN apt-get update -qq \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # Oracle JDK
-ENV ORACLE_JDK_VERSION jdk-8u161
-ENV ORACLE_JDK_URL http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-x64.tar.gz
+ENV ORACLE_JDK_VERSION jdk-8u172
+ENV ORACLE_JDK_URL http://download.oracle.com/otn-pub/java/jdk/8u172-b11/a58eab1ec242421181065cdc37240b08/jdk-8u172-linux-x64.tar.gz
 RUN mkdir -p /opt/jdk/$ORACLE_JDK_VERSION && \
     wget --header "Cookie: oraclelicense=accept-securebackup-cookie" -O /opt/jdk/$ORACLE_JDK_VERSION/$ORACLE_JDK_VERSION.tar.gz $ORACLE_JDK_URL && \
     tar -zxf /opt/jdk/$ORACLE_JDK_VERSION/$ORACLE_JDK_VERSION.tar.gz --strip-components=1 -C /opt/jdk/$ORACLE_JDK_VERSION && \
@@ -36,7 +36,7 @@ RUN \
     groupadd --gid ${RUN_GROUP_GID} -r ${RUN_GROUP} && \
     useradd -r --uid ${RUN_USER_UID} -g ${RUN_GROUP} ${RUN_USER}
 
-ENV JIRA_VERSION 7.9.0
+ENV JIRA_VERSION 7.9.2
 ENV JIRA_HOME /var/atlassian/jira/data
 ENV JIRA_INSTALL_DIR /opt/atlassian/jira
 
