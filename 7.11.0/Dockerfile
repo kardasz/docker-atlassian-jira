@@ -49,7 +49,7 @@ ENV MYSQL_CONNECTOR_VERSION 8.0.11
 RUN \
     wget -O ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz && \
     tar xzf ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz -C ${JIRA_INSTALL_DIR} && \
-    mv ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}-bin.jar ${JIRA_INSTALL_DIR}/lib/ && \
+    mv ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.jar ${JIRA_INSTALL_DIR}/lib/ && \
     rm -rf ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}
 
 ENV PATH $JIRA_INSTALL_DIR/bin:$JAVA_HOME/bin:$PATH
