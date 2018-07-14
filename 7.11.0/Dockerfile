@@ -36,7 +36,7 @@ RUN \
     groupadd --gid ${RUN_GROUP_GID} -r ${RUN_GROUP} && \
     useradd -r --uid ${RUN_USER_UID} -g ${RUN_GROUP} ${RUN_USER}
 
-ENV JIRA_VERSION 7.10.2
+ENV JIRA_VERSION 7.11.0
 ENV JIRA_HOME /var/atlassian/jira/data
 ENV JIRA_INSTALL_DIR /opt/atlassian/jira
 
@@ -45,7 +45,7 @@ RUN mkdir -p ${JIRA_INSTALL_DIR} ${JIRA_HOME} && \
     chown -R ${RUN_USER}:${RUN_GROUP} ${JIRA_HOME} ${JIRA_INSTALL_DIR}
 
 # MySQL connector
-ENV MYSQL_CONNECTOR_VERSION 5.1.44
+ENV MYSQL_CONNECTOR_VERSION 8.0.11
 RUN \
     wget -O ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz && \
     tar xzf ${JIRA_INSTALL_DIR}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz -C ${JIRA_INSTALL_DIR} && \

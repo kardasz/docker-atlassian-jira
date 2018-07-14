@@ -13,7 +13,7 @@ services:
         - postgres-data:/var/lib/postgresql/data
   jira:
     build: .
-    image: webinventions/atlassian-jira:7.10.2
+    image: webinventions/atlassian-jira:7.11.0
     ports:
       - "${BIND_IP}:8080:8080"
     depends_on:
