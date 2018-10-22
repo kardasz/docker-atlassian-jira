@@ -9,9 +9,9 @@ BUILD_ARGS ?=
 include .env
 export
 
-COMPOSE_FILE_ARGS ?= -f $(CURDIR)/docker-compose.yml
+COMPOSE_FILE_ARGS ?= -f docker-compose.yml
 
-DOCKER_COMPOSE = docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME)
+DOCKER_COMPOSE = docker-compose $(COMPOSE_FILE_ARGS)
 
 ifeq ($(shell uname -s),Darwin)
 XARGS_OPTS =
@@ -20,46 +20,46 @@ XARGS_OPTS = -r
 endif
 
 build:
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) build --no-cache jira
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) build jira
 
 push: build
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) push jira
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) push jira
 
 up: env-check
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) up $(UP_ARGS) ${SERVICE}
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) up $(UP_ARGS) ${SERVICE}
 
 logs: env-check
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) logs --tail=100 -f
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) logs --tail=100 -f
 
 stop: env-check
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) stop ${SERVICE}
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) stop ${SERVICE}
 
 rm: stop
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) rm -f ${SERVICE}
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) rm -f ${SERVICE}
 
 restart: env-check
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) restart $(SERVICE)
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) restart $(SERVICE)
 
 recreate: env-check
 	$(DOCKER_COMPOSE) up -d --force-recreate --build jira
 
 down: env-check
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) down $(DOWN_ARGS)
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) down $(DOWN_ARGS)
 
 exec: up
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) exec -T $(SERVICE) $(EXEC_ARGS)
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) exec -T $(SERVICE) $(EXEC_ARGS)
 
 bash: up
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) exec $(SERVICE) bash
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) exec $(SERVICE) bash
 
 jira: up
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) exec jira bash
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) exec jira bash
 
 psql: up
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) exec $(SERVICE) psql -U jira
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) exec $(SERVICE) psql -U jira
 
 ps:
-	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) -p $(PROJECT_NAME) ps
+	$(COMPOSE_ENV) docker-compose $(COMPOSE_FILE_ARGS) ps
 
 env-check:
 ifeq ($(shell uname -s),Darwin)
